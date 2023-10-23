@@ -129,29 +129,35 @@ def handler(event, context):
             send_message(f"Нашел! Вот топ-5 исполнителей в жанре {genre_reply}:\n\n{''.join(top_artists)}", chat_id)   
     
     elif reply.startswith("/recommendArtists"):
-        artist_name = reply.split("/recommendArtists ", 1)[1]
-        similar_artists = get_similar_artists(artist_name)
-        if similar_artists:
-            message = f"Я тоже люблю {artist_name}, представляешь? 🥰 Думаю, ты оценишь по достоинству следующих исполнителей:\n\n"
-            for i, artist in enumerate(similar_artists[:5]):
-                message += f"{i+1}. {artist[0]} - {artist[1]}\n"
-            send_message(message, chat_id)
+        if "/recommendArtists " not in reply:
+            send_message("Укажите название исполнителя. Например, /recommendArtists Hurts", chat_id)
         else:
-            send_message(f"К сожалению, я не могу найти похожих исполнителей на {artist_name}", chat_id)
-    
-    elif reply.startswith("/similarSongs"):
-        args = reply.split("/similarSongs ", 1)[1].split(" - ")
-        if len(args) < 2:
-            send_message("Укажите название исполнителя и трека через дефис. Например, /similarSongs Hurts - Wonderful Life", chat_id)
-        else:
-            artist_name, track_name = args
-            insert_similar("similar", artist_name, track_name)
-            similar_tracks = get_similar_tracks(artist_name, track_name)
-            if similar_tracks:
-                message = f"А ты знаешь толк в хорошей музыке! Вот список песен, похожих на {track_name} исполнителя {artist_name}. Нажми на песню, чтобы послушать ее на last.fm 💃\n\n{''.join(similar_tracks)}"
+            artist_name = reply.split("/recommendArtists ", 1)[1]
+            similar_artists = get_similar_artists(artist_name)
+            if similar_artists:
+                message = f"Я тоже люблю {artist_name}, представляешь? 🥰 Думаю, ты оценишь по достоинству следующих исполнителей:\n\n"
+                for i, artist in enumerate(similar_artists[:5]):
+                    message += f"{i+1}. {artist[0]} - {artist[1]}\n"
                 send_message(message, chat_id)
             else:
-                send_message(f"К сожалению, я не могу найти похожих треков на {track_name} исполнителя {artist_name}", chat_id)
+                send_message(f"К сожалению, я не могу найти похожих исполнителей на {artist_name}", chat_id)
+    
+    elif reply.startswith("/similarSongs"):
+        if "/similarSongs " not in reply:
+            send_message("Укажите название исполнителя и трека через дефис. Например, /similarSongs Hurts - Wonderful Life", chat_id)
+        else:
+            args = reply.split("/similarSongs ", 1)[1].split(" - ")
+            if len(args) != 2:
+                send_message("Укажите название исполнителя и трека через дефис. Например, /similarSongs Hurts - Wonderful Life", chat_id)
+            else:
+                artist_name, track_name = args
+                insert_similar("similar", artist_name, track_name)
+                similar_tracks = get_similar_tracks(artist_name, track_name)
+                if similar_tracks:
+                    message = f"А ты знаешь толк в хорошей музыке! Вот список песен, похожих на {track_name} исполнителя {artist_name}. Нажми на песню, чтобы послушать ее на last.fm 💃\n\n{''.join(similar_tracks)}"
+                    send_message(message, chat_id)
+                else:
+                    send_message(f"К сожалению, я не могу найти похожих треков на {track_name} исполнителя {artist_name}", chat_id)
                 
     else:
         send_message("Прости, я не совсем понимаю что ты имеешь в виду", chat_id)
