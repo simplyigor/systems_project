@@ -40,9 +40,9 @@ def insert_genres(tablename, genre_reply):
         settings=ydb.BaseRequestSettings().with_timeout(3).with_operation_timeout(2)
     ))
 
-def insert_similar(tablename, artist_name):
+def insert_similar(tablename, artist_name, track_name):
     # create the transaction and execute query.
-    text = f"INSERT INTO {tablename} SELECT '{randomword()}' as id, '{artist_name}' as name;"
+    text = f"INSERT INTO {tablename} SELECT '{randomword()}' as id, '{artist_name}' as artist_name, '{track_name}' as track;"
     return pool.retry_operation_sync(lambda s: s.transaction().execute(
         text,
         commit_tx=True,
