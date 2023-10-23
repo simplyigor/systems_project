@@ -81,8 +81,11 @@ def get_similar_tracks(artist_name, track_name):
     response = requests.get(url)
     if response.status_code == 200:
         data = json.loads(response.content)
-        tracks = data['similartracks']['track']
-        return [f"<a href='{urllib.parse.quote_plus(track['url'])}'>{track['name']} - {track['artist']['name']}</a>\n" for track in tracks[:5]]
+        if 'similartracks' in data and 'track' in data['similartracks']:
+            tracks = data['similartracks']['track']
+            return [f"<a href='{urllib.parse.quote_plus(track['url'])}'>{track['name']} - {track['artist']['name']}</a>\n" for track in tracks[:5]]
+        else:
+            return []
     else:
         return []
 
